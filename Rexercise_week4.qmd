@@ -1,0 +1,15 @@
+---
+title: "Rexercise_week4"
+author: Noémie
+format: html
+toc: True
+---
+#Exercise A Segmentation 
+
+## Import data 
+```{r}
+library(readr)
+wild<- read_delim("wildschwein_BE_2056.csv", delim=",")
+```
+
+## Task 1 Calculate distance
