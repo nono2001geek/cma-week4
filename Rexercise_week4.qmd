@@ -83,6 +83,32 @@ rosa <- rosa %>%
 ## Task 3 Visualization 
 
 ```{r}
+ggplot(rosa)+
+  geom_path(aes(E,N))+
+  geom_sf(aes(color =static))
+rosa_filter<- rosa %>% 
+  filter(!static)
+ggplot(rosa_filter)+
+  geom_path(aes(E,N))+
+  geom_sf(aes(color =static))
+rosa_filter %>% 
+    ggplot(aes(E, N)) +
+    geom_point(data = rosa, col = "red") +
+    geom_path() +
+    geom_point() +
+    coord_fixed() +
+    theme(legend.position = "bottom")
+```
 
+## Task 4 Segment based analysis
+Add a segment ID
+```{r}
+rle_id <- function(vec) {
+    x <- rle(vec)$lengths
+    as.factor(rep(seq_along(x), times = x))
+}
+
+rosa <- rosa %>% 
+  mutate(segment_id = rle_id(static))
 ```
 
