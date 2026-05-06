@@ -83,6 +83,7 @@ rosa <- rosa %>%
 ## Task 3 Visualization 
 
 ```{r}
+library(ggplot2)
 ggplot(rosa)+
   geom_path(aes(E,N))+
   geom_sf(aes(color =static))
@@ -110,5 +111,13 @@ rle_id <- function(vec) {
 
 rosa <- rosa %>% 
   mutate(segment_id = rle_id(static))
+```
+
+# Exercise B: Similarites
+## Task 1: Similarities measures
+import data 
+```{r}
+ped<-read_delim("pedestrian.csv")
+
 ```
 
