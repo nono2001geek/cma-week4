@@ -13,3 +13,61 @@ wild<- read_delim("wildschwein_BE_2056.csv", delim=",")
 ```
 
 ## Task 1 Calculate distance
+In the dataset Wildschwein, the trajectory of the wildschwein Rosa is going to be analysed. 
+```{r}
+ 
+library("sf")
+library("dplyr")
+
+rosa <- wild %>% 
+    st_as_sf(coords = c("E", "N"), crs = 2056, remove = FALSE) %>% 
+    filter(
+      TierName == "Rosa", 
+      DatetimeUTC >= "2014-11-07", 
+      DatetimeUTC < "2014-11-17"
+      )
+```
+
+### Step a)
+Temporal window of 1.30 hours
+--> including 6 fixes 
+pos[n-3] to pos[n]
+pos[n-2] to pos[n]
+pos[n-1] to pos[n]
+pos[n] to pos[n+1]
+pos[n] to pos[n+2]
+pos[n] to pos[n+3]
+### Step b) 
+Measure the distance to every point within v 
+--> again with the function that we used for the demo 
+
+```{r}
+distance_by_element <- function(later, now) {
+  as.numeric(
+    st_distance(later, now, by_element = TRUE)
+  )
+}
+
+
+rosa <- rosa  %>% 
+    mutate(
+        nMinus3 = distance_by_element(lag(geometry, n = 3), geometry),
+        nMinus2 = distance_by_element(lag(geometry, n = 2), geometry),  # distance to pos -30 minutes --> two postitions before 
+        nMinus1 = distance_by_element(lag(geometry, n = 1), geometry),  # distance to pos -15 minutes
+        nPlus1  = distance_by_element(geometry, lead(geometry, 1)), # distance to pos +15 mintues
+        nPlus2  = distance_by_element(geometry, lead(geometry, 2)),  # distance to pos +30 minutes
+        nPlus3  = distance_by_element(geometry, lead(geometry, 3))
+    )
+        
+
+rosa <- rosa %>%
+    rowwise() %>% #one value per row
+    mutate(
+        stepMean = mean(c(nMinus3, nMinus2, nMinus1, nPlus1, nPlus2, nPlus3))
+    ) %>%
+    ungroup() #because of the rowwise! 
+
+rosa
+```
+
+

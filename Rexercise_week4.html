@@ -84,7 +84,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#import-data" id="toc-import-data" class="nav-link active" data-scroll-target="#import-data">Import data</a></li>
-  <li><a href="#task-1-calculate-distance" id="toc-task-1-calculate-distance" class="nav-link" data-scroll-target="#task-1-calculate-distance">Task 1 Calculate distance</a></li>
+  <li><a href="#task-1-calculate-distance" id="toc-task-1-calculate-distance" class="nav-link" data-scroll-target="#task-1-calculate-distance">Task 1 Calculate distance</a>
+  <ul class="collapse">
+  <li><a href="#step-a" id="toc-step-a" class="nav-link" data-scroll-target="#step-a">Step a)</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -136,6 +139,90 @@ dttm (1): DatetimeUTC
 </section>
 <section id="task-1-calculate-distance" class="level2">
 <h2 class="anchored" data-anchor-id="task-1-calculate-distance">Task 1 Calculate distance</h2>
+<p>In the dataset Wildschwein, the trajectory of the wildschwein Rosa is going to be analysed.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"sf"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Linking to GEOS 3.13.1, GDAL 3.11.0, PROJ 9.6.0; sf_use_s2() is TRUE</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"dplyr"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attachement du package : 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Les objets suivants sont masqués depuis 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Les objets suivants sont masqués depuis 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>rosa <span class="ot">&lt;-</span> wild <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"E"</span>, <span class="st">"N"</span>), <span class="at">crs =</span> <span class="dv">2056</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>      TierName <span class="sc">==</span> <span class="st">"Rosa"</span>, </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      DatetimeUTC <span class="sc">&gt;=</span> <span class="st">"2014-11-07"</span>, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      DatetimeUTC <span class="sc">&lt;</span> <span class="st">"2014-11-17"</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="step-a" class="level3">
+<h3 class="anchored" data-anchor-id="step-a">Step a)</h3>
+<p>Temporal window of 1.30 hours –&gt; including 6 fixes pos[n-3] to pos[n] pos[n-2] to pos[n] pos[n-1] to pos[n] pos[n] to pos[n+1] pos[n] to pos[n+2] pos[n] to pos[n+3] ### Step b) Measure the distance to every point within v –&gt; again with the function that we used for the demo</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>distance_by_element <span class="ot">&lt;-</span> <span class="cf">function</span>(later, now) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_distance</span>(later, now, <span class="at">by_element =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>rosa <span class="ot">&lt;-</span> rosa  <span class="sc">%&gt;%</span> </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus3 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="at">n =</span> <span class="dv">3</span>), geometry),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus2 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="at">n =</span> <span class="dv">2</span>), geometry),  <span class="co"># distance to pos -30 minutes --&gt; two postitions before </span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        <span class="at">nMinus1 =</span> <span class="fu">distance_by_element</span>(<span class="fu">lag</span>(geometry, <span class="at">n =</span> <span class="dv">1</span>), geometry),  <span class="co"># distance to pos -15 minutes</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus1  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">1</span>)), <span class="co"># distance to pos +15 mintues</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus2  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">2</span>)),  <span class="co"># distance to pos +30 minutes</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">nPlus3  =</span> <span class="fu">distance_by_element</span>(geometry, <span class="fu">lead</span>(geometry, <span class="dv">3</span>))</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>rosa <span class="ot">&lt;-</span> rosa <span class="sc">%&gt;%</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span> <span class="co">#one value per row</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">stepMean =</span> <span class="fu">mean</span>(<span class="fu">c</span>(nMinus3, nMinus2, nMinus1, nPlus1, nPlus2, nPlus3))</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="co">#because of the rowwise! </span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>rosa</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 696 features and 13 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 2569231 ymin: 1204443 xmax: 2570395 ymax: 1206051
+Projected CRS: CH1903+ / LV95
+# A tibble: 696 × 14
+   TierID TierName CollarID DatetimeUTC                E        N
+   &lt;chr&gt;  &lt;chr&gt;       &lt;dbl&gt; &lt;dttm&gt;                 &lt;dbl&gt;    &lt;dbl&gt;
+ 1 016A   Rosa        13972 2014-11-07 07:45:44 2570385. 1204812.
+ 2 016A   Rosa        13972 2014-11-07 08:00:10 2570389. 1204821.
+ 3 016A   Rosa        13972 2014-11-07 08:15:18 2570375. 1204787.
+ 4 016A   Rosa        13972 2014-11-07 08:30:23 2570387. 1204828.
+ 5 016A   Rosa        13972 2014-11-07 08:46:08 2570387. 1204853.
+ 6 016A   Rosa        13972 2014-11-07 09:00:11 2570387. 1204857.
+ 7 016A   Rosa        13972 2014-11-07 09:15:15 2570392. 1204821.
+ 8 016A   Rosa        13972 2014-11-07 09:30:11 2570395. 1204818.
+ 9 016A   Rosa        13972 2014-11-07 09:45:16 2570391. 1204838.
+10 016A   Rosa        13972 2014-11-07 10:00:44 2569917. 1205031.
+# ℹ 686 more rows
+# ℹ 8 more variables: geometry &lt;POINT [m]&gt;, nMinus3 &lt;dbl&gt;, nMinus2 &lt;dbl&gt;,
+#   nMinus1 &lt;dbl&gt;, nPlus1 &lt;dbl&gt;, nPlus2 &lt;dbl&gt;, nPlus3 &lt;dbl&gt;, stepMean &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
 </section>
 
 </main>
