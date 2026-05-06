@@ -94,6 +94,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#exercise-b-similarites" id="toc-exercise-b-similarites" class="nav-link" data-scroll-target="#exercise-b-similarites">Exercise B: Similarites</a>
   <ul class="collapse">
   <li><a href="#task-1-similarities-measures" id="toc-task-1-similarities-measures" class="nav-link" data-scroll-target="#task-1-similarities-measures">Task 1: Similarities measures</a></li>
+  <li><a href="#task-2-calculate-similarity" id="toc-task-2-calculate-similarity" class="nav-link" data-scroll-target="#task-2-calculate-similarity">Task 2: calculate similarity</a>
+  <ul class="collapse">
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -321,7 +325,9 @@ Projected CRS: CH1903+ / LV95
 <h2 class="anchored" data-anchor-id="task-1-similarities-measures">Task 1: Similarities measures</h2>
 <p>import data</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>ped<span class="ot">&lt;-</span><span class="fu">read_delim</span>(<span class="st">"pedestrian.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>my_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"1"</span> <span class="ot">=</span> <span class="st">"#D55E00"</span>, <span class="st">"2"</span> <span class="ot">=</span> <span class="st">"#E69F00"</span>, <span class="st">"3"</span> <span class="ot">=</span> <span class="st">"#009E73"</span>, </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">"4"</span> <span class="ot">=</span> <span class="st">"#0072B2"</span>, <span class="st">"5"</span> <span class="ot">=</span> <span class="st">"#56B4E9"</span>, <span class="st">"6"</span> <span class="ot">=</span> <span class="st">"#CC79A7"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>ped<span class="ot">&lt;-</span><span class="fu">read_delim</span>(<span class="st">"pedestrian.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 289 Columns: 4
 ── Column specification ────────────────────────────────────────────────────────
@@ -332,7 +338,206 @@ dttm (1): DatetimeUTC
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>ped</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 289 × 4
+   TrajID        E        N DatetimeUTC        
+    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;dttm&gt;             
+ 1      1 2571414. 1205804. 2015-03-01 12:01:00
+ 2      1 2571396. 1205791. 2015-03-01 12:02:00
+ 3      1 2571373. 1205770. 2015-03-01 12:03:00
+ 4      1 2571347. 1205753. 2015-03-01 12:04:00
+ 5      1 2571336. 1205744. 2015-03-01 12:05:00
+ 6      1 2571321. 1205732. 2015-03-01 12:06:00
+ 7      1 2571304. 1205723. 2015-03-01 12:07:00
+ 8      1 2571285. 1205706. 2015-03-01 12:08:00
+ 9      1 2571253. 1205694. 2015-03-01 12:09:00
+10      1 2571219. 1205674. 2015-03-01 12:10:00
+# ℹ 279 more rows</code></pre>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>ped <span class="ot">&lt;-</span> ped <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"E"</span>, <span class="st">"N"</span>), <span class="at">crs =</span> <span class="dv">2056</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co">#visualization</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ped) <span class="sc">+</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1. Couche de fond : TOUS les points en gris clair, pour TOUS les panneaux</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">group =</span> TrajID), <span class="at">color =</span> <span class="st">"grey85"</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2. Couche de premier plan : On trace TOUTES les trajectoires, </span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># mais on va les colorier selon leur ID.</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Comme on est dans facet_wrap(~TrajID), ggplot va automatiquement </span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># "zoomer" sur l'ID correspondant, mais les données colorées sont toutes là.</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_sf</span>(<span class="fu">aes</span>(<span class="at">color =</span> <span class="fu">factor</span>(TrajID)), <span class="at">size =</span> <span class="fl">2.5</span>) <span class="sc">+</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>TrajID) <span class="sc">+</span></span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># On applique nos couleurs manuelles. </span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Dans chaque panneau, seule la couleur correspondante sera visible au premier plan.</span></span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> my_colors, <span class="at">guide =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Visual comparison of the 6 trajectories"</span>,</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"Each subplot highlights a trajectory"</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Rexercise_week4_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="task-2-calculate-similarity" class="level2">
+<h2 class="anchored" data-anchor-id="task-2-calculate-similarity">Task 2: calculate similarity</h2>
+<p>The trajectories that are the most similar to me are: Traj 1 and 2; 6 and 1</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>ped_no_geom <span class="ot">&lt;-</span> <span class="fu">st_drop_geometry</span>(ped)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SimilarityMeasures)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: le package 'SimilarityMeasures' a été compilé avec la version R 4.5.2</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#séparer les trajectoires en 6 dataset</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>traj_list <span class="ot">&lt;-</span> <span class="fu">split</span>(ped_no_geom, ped_no_geom<span class="sc">$</span>TrajID)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">#créer une matrixe avec chaque trajectoires </span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>traj_matrices <span class="ot">&lt;-</span> <span class="fu">lapply</span>(traj_list, <span class="cf">function</span>(df) {</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  coords <span class="ot">&lt;-</span> df[, <span class="fu">c</span>(<span class="st">"E"</span>, <span class="st">"N"</span>)]   <span class="co"># IMPORTANT: uniquement E et N</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  coords<span class="sc">$</span>E <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(coords<span class="sc">$</span>E)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  coords<span class="sc">$</span>N <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(coords<span class="sc">$</span>N)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(coords)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">#trier les points dans l'ordre</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>traj_list <span class="ot">&lt;-</span> <span class="fu">lapply</span>(traj_list, <span class="cf">function</span>(df) {</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  df[<span class="fu">order</span>(df<span class="sc">$</span>DatetimeUTC), ]</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="co">#check </span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>traj_matrices[[<span class="dv">1</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            E       N
+ [1,] 2571414 1205804
+ [2,] 2571396 1205791
+ [3,] 2571373 1205770
+ [4,] 2571347 1205753
+ [5,] 2571336 1205744
+ [6,] 2571321 1205732
+ [7,] 2571304 1205723
+ [8,] 2571285 1205706
+ [9,] 2571253 1205694
+[10,] 2571219 1205674
+[11,] 2571190 1205653
+[12,] 2571170 1205633
+[13,] 2571145 1205615
+[14,] 2571113 1205596
+[15,] 2571068 1205580
+[16,] 2571049 1205564
+[17,] 2571028 1205548
+[18,] 2571003 1205534
+[19,] 2570974 1205518
+[20,] 2570954 1205505
+[21,] 2570928 1205483
+[22,] 2570900 1205466
+[23,] 2570871 1205442
+[24,] 2570826 1205409
+[25,] 2570791 1205390
+[26,] 2570765 1205378
+[27,] 2570728 1205344
+[28,] 2570699 1205318
+[29,] 2570623 1205289
+[30,] 2570573 1205256
+[31,] 2570519 1205224
+[32,] 2570477 1205195
+[33,] 2570434 1205167
+[34,] 2570413 1205152
+[35,] 2570390 1205178
+[36,] 2570377 1205196
+[37,] 2570369 1205214
+[38,] 2570319 1205294
+[39,] 2570214 1205431
+[40,] 2570130 1205543
+[41,] 2569963 1205755
+[42,] 2569825 1205952
+[43,] 2569691 1206125
+[44,] 2569530 1206361
+[45,] 2569417 1206487
+[46,] 2569303 1206503
+[47,] 2569259 1206556</code></pre>
+</div>
+</div>
+<p>funtion to run all the 3 different methods of trajectory comparison between the traj 1 and the 5 others</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Trajectory =</span> <span class="fu">paste0</span>(<span class="st">"traj"</span>, <span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>),</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">DTW =</span> <span class="fu">sapply</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>, <span class="cf">function</span>(i) <span class="fu">DTW</span>(traj_matrices[[<span class="dv">1</span>]], traj_matrices[[i]])),</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Frechet =</span> <span class="fu">sapply</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>, <span class="cf">function</span>(i) <span class="fu">Frechet</span>(traj_matrices[[<span class="dv">1</span>]], traj_matrices[[i]])),</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">EditDist =</span> <span class="fu">sapply</span>(<span class="dv">2</span><span class="sc">:</span><span class="dv">6</span>, <span class="cf">function</span>(i) <span class="fu">EditDist</span>(traj_matrices[[<span class="dv">1</span>]], traj_matrices[[i]]))</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Trajectory       DTW    Frechet EditDist
+1      traj2  3650.025   28.54075       45
+2      traj3 50785.511 2307.84366       47
+3      traj4  5906.787 1069.22917       42
+4      traj5  2178.411  717.98159       28
+5      traj6  1152.718   38.96272       27</code></pre>
+</div>
+</div>
+<p>Visualisation</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>results_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(results, </span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">cols =</span> <span class="sc">-</span>Trajectory,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">names_to =</span> <span class="st">"Measure"</span>,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">values_to =</span> <span class="st">"Distance"</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(results_long, <span class="fu">aes</span>(<span class="at">x =</span> Trajectory, <span class="at">y =</span> Distance, <span class="at">fill =</span> Measure)) <span class="sc">+</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Trajectory Similarity Comparison (without normalization of the data"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-plot-result" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-plot-result-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Rexercise_week4_files/figure-html/fig-plot-result-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-result-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: comparison of similarity measures
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Visualisation avec des données log</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>results_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(results, </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">cols =</span> <span class="sc">-</span>Trajectory,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">names_to =</span> <span class="st">"Measure"</span>,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">values_to =</span> <span class="st">"Distance"</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(results_long, <span class="fu">aes</span>(<span class="at">x =</span> Trajectory, <span class="at">y =</span> Distance, <span class="at">fill =</span> Measure)) <span class="sc">+</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Trajectory Similarity (log scale)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-plot-result-log" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-plot-result-log-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Rexercise_week4_files/figure-html/fig-plot-result-log-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-plot-result-log-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: comparison of similarity measures (log-scale)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="results" class="level3">
+<h3 class="anchored" data-anchor-id="results">Results</h3>
+<p>With the plots <a href="#fig-plot-result" class="quarto-xref">Figure&nbsp;1</a> and <a href="#fig-plot-result-log" class="quarto-xref">Figure&nbsp;2</a>, it is possible to see that the trajectory 6 is the most similar to the trajectory 1 and the trajectory 3 is the most dissimilar. The logaritmization of the values was necessary since the range of values are very different depending on the test executed.</p>
+</section>
 </section>
 </section>
 

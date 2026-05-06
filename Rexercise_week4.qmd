@@ -117,7 +117,106 @@ rosa <- rosa %>%
 ## Task 1: Similarities measures
 import data 
 ```{r}
+my_colors <- c("1" = "#D55E00", "2" = "#E69F00", "3" = "#009E73", 
+               "4" = "#0072B2", "5" = "#56B4E9", "6" = "#CC79A7")
 ped<-read_delim("pedestrian.csv")
+ped
+ped <- ped %>% 
+    st_as_sf(coords = c("E", "N"), crs = 2056, remove = FALSE)
+#visualization
+ggplot(ped) +
+  # 1. Couche de fond : TOUS les points en gris clair, pour TOUS les panneaux
+  geom_sf(aes(group = TrajID), color = "grey85", size = 1.5) +
+  
+  # 2. Couche de premier plan : On trace TOUTES les trajectoires, 
+  # mais on va les colorier selon leur ID.
+  # Comme on est dans facet_wrap(~TrajID), ggplot va automatiquement 
+  # "zoomer" sur l'ID correspondant, mais les données colorées sont toutes là.
+  geom_sf(aes(color = factor(TrajID)), size = 2.5) +
+  
+  facet_wrap(~TrajID) +
+  
+  # On applique nos couleurs manuelles. 
+  # Dans chaque panneau, seule la couleur correspondante sera visible au premier plan.
+  scale_color_manual(values = my_colors, guide = "none") +
+  
+  labs(
+    title = "Visual comparison of the 6 trajectories",
+    subtitle = "Each subplot highlights a trajectory"
+  ) +
+  theme_minimal()
+```
+## Task 2: calculate similarity
+
+The trajectories that are the most similar to me are: 
+Traj 1 and 2; 6 and 1
+```{r}
+ped_no_geom <- st_drop_geometry(ped)
+library(SimilarityMeasures)
+#séparer les trajectoires en 6 dataset
+traj_list <- split(ped_no_geom, ped_no_geom$TrajID)
+#créer une matrixe avec chaque trajectoires 
+traj_matrices <- lapply(traj_list, function(df) {
+  coords <- df[, c("E", "N")]   # IMPORTANT: uniquement E et N
+  coords$E <- as.numeric(coords$E)
+  coords$N <- as.numeric(coords$N)
+  as.matrix(coords)
+})
+#trier les points dans l'ordre
+traj_list <- lapply(traj_list, function(df) {
+  df[order(df$DatetimeUTC), ]
+})
+#check 
+traj_matrices[[1]]
+```
+funtion to run all the 3 different methods of trajectory comparison between the traj 1 and the 5 others 
+```{r}
+results <- data.frame(
+  Trajectory = paste0("traj", 2:6),
+  DTW = sapply(2:6, function(i) DTW(traj_matrices[[1]], traj_matrices[[i]])),
+  Frechet = sapply(2:6, function(i) Frechet(traj_matrices[[1]], traj_matrices[[i]])),
+  EditDist = sapply(2:6, function(i) EditDist(traj_matrices[[1]], traj_matrices[[i]]))
+)
+
+results
 
 ```
+
+
+Visualisation 
+```{r}
+#| label: fig-plot-result
+#| fig-cap: "comparison of similarity measures"
+
+library(ggplot2)
+library(tidyr)
+
+results_long <- pivot_longer(results, 
+                             cols = -Trajectory,
+                             names_to = "Measure",
+                             values_to = "Distance")
+
+ggplot(results_long, aes(x = Trajectory, y = Distance, fill = Measure)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
+  ggtitle("Trajectory Similarity Comparison (without normalization of the data")
+```
+Visualisation avec des données log 
+```{r}
+#| label: fig-plot-result-log
+#| fig-cap: "comparison of similarity measures (log-scale)"
+results_long <- pivot_longer(results, 
+                             cols = -Trajectory,
+                             names_to = "Measure",
+                             values_to = "Distance")
+
+ggplot(results_long, aes(x = Trajectory, y = Distance, fill = Measure)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_y_log10() +
+  theme_minimal() +
+  ggtitle("Trajectory Similarity (log scale)")
+```
+
+### Results
+With the plots @fig-plot-result and @fig-plot-result-log, it is possible to see that the trajectory 6 is the most similar to the trajectory 1 and the trajectory 3 is the most dissimilar. The logaritmization of the values was necessary since the range of values are very different depending on the test executed. 
 
