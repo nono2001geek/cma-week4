@@ -4,7 +4,8 @@ author: Noémie
 format: html
 toc: True
 ---
-#Exercise A Segmentation 
+
+# Exercise A Segmentation 
 ## Import data 
 ```{r}
 library(readr)

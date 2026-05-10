@@ -83,13 +83,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#task-1-calculate-distance" id="toc-task-1-calculate-distance" class="nav-link active" data-scroll-target="#task-1-calculate-distance">Task 1 Calculate distance</a>
+  <li><a href="#exercise-a-segmentation" id="toc-exercise-a-segmentation" class="nav-link active" data-scroll-target="#exercise-a-segmentation">Exercise A Segmentation</a>
+  <ul class="collapse">
+  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">Import data</a></li>
+  <li><a href="#task-1-calculate-distance" id="toc-task-1-calculate-distance" class="nav-link" data-scroll-target="#task-1-calculate-distance">Task 1 Calculate distance</a>
   <ul class="collapse">
   <li><a href="#step-a" id="toc-step-a" class="nav-link" data-scroll-target="#step-a">Step a)</a></li>
   </ul></li>
   <li><a href="#task-2-specify-and-apply-threshold-d" id="toc-task-2-specify-and-apply-threshold-d" class="nav-link" data-scroll-target="#task-2-specify-and-apply-threshold-d">Task 2 Specify and apply threshold d</a></li>
   <li><a href="#task-3-visualization" id="toc-task-3-visualization" class="nav-link" data-scroll-target="#task-3-visualization">Task 3 Visualization</a></li>
   <li><a href="#task-4-segment-based-analysis" id="toc-task-4-segment-based-analysis" class="nav-link" data-scroll-target="#task-4-segment-based-analysis">Task 4 Segment based analysis</a></li>
+  </ul></li>
   <li><a href="#exercise-b-similarites" id="toc-exercise-b-similarites" class="nav-link" data-scroll-target="#exercise-b-similarites">Exercise B: Similarites</a>
   <ul class="collapse">
   <li><a href="#task-1-similarities-measures" id="toc-task-1-similarities-measures" class="nav-link" data-scroll-target="#task-1-similarities-measures">Task 1: Similarities measures</a></li>
@@ -128,7 +132,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>#Exercise A Segmentation ## Import data</p>
+<section id="exercise-a-segmentation" class="level1">
+<h1>Exercise A Segmentation</h1>
+<section id="import-data" class="level2">
+<h2 class="anchored" data-anchor-id="import-data">Import data</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>wild<span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"wildschwein_BE_2056.csv"</span>, <span class="at">delim=</span><span class="st">","</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -144,6 +151,7 @@ dttm (1): DatetimeUTC
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
 </div>
+</section>
 <section id="task-1-calculate-distance" class="level2">
 <h2 class="anchored" data-anchor-id="task-1-calculate-distance">Task 1 Calculate distance</h2>
 <p>In the dataset Wildschwein, the trajectory of the wildschwein Rosa is going to be analysed.</p>
@@ -314,6 +322,7 @@ Projected CRS: CH1903+ / LV95
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>rosa <span class="ot">&lt;-</span> rosa <span class="sc">%&gt;%</span> </span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">segment_id =</span> <span class="fu">rle_id</span>(static))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+</section>
 </section>
 <section id="exercise-b-similarites" class="level1">
 <h1>Exercise B: Similarites</h1>
