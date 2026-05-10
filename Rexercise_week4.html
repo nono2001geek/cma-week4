@@ -83,8 +83,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#import-data" id="toc-import-data" class="nav-link active" data-scroll-target="#import-data">Import data</a></li>
-  <li><a href="#task-1-calculate-distance" id="toc-task-1-calculate-distance" class="nav-link" data-scroll-target="#task-1-calculate-distance">Task 1 Calculate distance</a>
+  <li><a href="#task-1-calculate-distance" id="toc-task-1-calculate-distance" class="nav-link active" data-scroll-target="#task-1-calculate-distance">Task 1 Calculate distance</a>
   <ul class="collapse">
   <li><a href="#step-a" id="toc-step-a" class="nav-link" data-scroll-target="#step-a">Step a)</a></li>
   </ul></li>
@@ -129,9 +128,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>#Exercise A Segmentation</p>
-<section id="import-data" class="level2">
-<h2 class="anchored" data-anchor-id="import-data">Import data</h2>
+<p>#Exercise A Segmentation ## Import data</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>wild<span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"wildschwein_BE_2056.csv"</span>, <span class="at">delim=</span><span class="st">","</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -147,7 +144,6 @@ dttm (1): DatetimeUTC
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
 </div>
-</section>
 <section id="task-1-calculate-distance" class="level2">
 <h2 class="anchored" data-anchor-id="task-1-calculate-distance">Task 1 Calculate distance</h2>
 <p>In the dataset Wildschwein, the trajectory of the wildschwein Rosa is going to be analysed.</p>
@@ -534,9 +530,52 @@ Figure&nbsp;2: comparison of similarity measures (log-scale)
 </div>
 </div>
 </div>
+<p>Visualisation with facet wrap</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>results_long <span class="ot">&lt;-</span> results_long <span class="sc">%&gt;%</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Trajectory =</span> <span class="fu">factor</span>(Trajectory))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(results_long, <span class="fu">aes</span>(<span class="at">x =</span> Trajectory, <span class="at">y =</span> Distance, <span class="at">fill =</span> Trajectory)) <span class="sc">+</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Measure, <span class="at">nrow =</span> <span class="dv">2</span>, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="fu">position_dodge</span>()) <span class="sc">+</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_gray</span>() <span class="sc">+</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Computed similarities using different measures</span><span class="sc">\n</span><span class="st">between trajectory 1 to all other trajectories"</span>) <span class="sc">+</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlab</span>(<span class="st">"Comparison trajectory"</span>) <span class="sc">+</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Value"</span>) <span class="sc">+</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 3. Les noms à gauche de = doivent être des STRINGS (entre guillemets)</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># qui correspondent EXACTEMENT aux niveaux du facteur</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">values =</span> <span class="fu">c</span>(</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"traj2"</span> <span class="ot">=</span> <span class="st">"#F8766D"</span>,</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"traj3"</span> <span class="ot">=</span> <span class="st">"#A3A500"</span>,</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"traj4"</span> <span class="ot">=</span> <span class="st">"#00BF7D"</span>,</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>      <span class="st">"traj5"</span> <span class="ot">=</span> <span class="st">"#00B0F6"</span>,</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">"traj6"</span> <span class="ot">=</span> <span class="st">"#E76BF3"</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"none"</span>,</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)</span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-facet-wrap" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-facet-wrap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="Rexercise_week4_files/figure-html/fig-facet-wrap-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-facet-wrap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: comparison of similarity measures (log-scale)
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
 <section id="results" class="level3">
 <h3 class="anchored" data-anchor-id="results">Results</h3>
-<p>With the plots <a href="#fig-plot-result" class="quarto-xref">Figure&nbsp;1</a> and <a href="#fig-plot-result-log" class="quarto-xref">Figure&nbsp;2</a>, it is possible to see that the trajectory 6 is the most similar to the trajectory 1 and the trajectory 3 is the most dissimilar. The logaritmization of the values was necessary since the range of values are very different depending on the test executed.</p>
+<p>With the plots <a href="#fig-plot-result" class="quarto-xref">Figure&nbsp;1</a> and <a href="#fig-plot-result-log" class="quarto-xref">Figure&nbsp;2</a>, it is possible to see that the trajectory 6 is the most similar to the trajectory 1 and the trajectory 3 is the most dissimilar. The logaritmization of the values was necessary since the range of values are very different depending on the test executed. The figure <a href="#fig-facet-wrap" class="quarto-xref">Figure&nbsp;3</a> resolves this problem.</p>
 </section>
 </section>
 </section>

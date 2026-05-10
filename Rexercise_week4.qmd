@@ -5,7 +5,6 @@ format: html
 toc: True
 ---
 #Exercise A Segmentation 
-
 ## Import data 
 ```{r}
 library(readr)
@@ -215,8 +214,45 @@ ggplot(results_long, aes(x = Trajectory, y = Distance, fill = Measure)) +
   scale_y_log10() +
   theme_minimal() +
   ggtitle("Trajectory Similarity (log scale)")
+
+ 
+```
+Visualisation with facet wrap 
+```{r}
+results_long <- results_long %>% 
+  mutate(Trajectory = factor(Trajectory))
+```
+
+```{r}  
+#| label: fig-facet-wrap
+#| fig-cap: "comparison of similarity measures (log-scale)"
+
+ggplot(results_long, aes(x = Trajectory, y = Distance, fill = Trajectory)) +
+  facet_wrap(~Measure, nrow = 2, scales = "free_y") +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  theme_gray() +
+  ggtitle("Computed similarities using different measures\nbetween trajectory 1 to all other trajectories") +
+  xlab("Comparison trajectory") +
+  ylab("Value") +
+  
+  # 3. Les noms à gauche de = doivent être des STRINGS (entre guillemets)
+  # qui correspondent EXACTEMENT aux niveaux du facteur
+  scale_fill_manual(
+    values = c(
+      "traj2" = "#F8766D",
+      "traj3" = "#A3A500",
+      "traj4" = "#00BF7D",
+      "traj5" = "#00B0F6",
+      "traj6" = "#E76BF3"
+    )
+  ) +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(hjust = 0.5)
+  )
 ```
 
 ### Results
-With the plots @fig-plot-result and @fig-plot-result-log, it is possible to see that the trajectory 6 is the most similar to the trajectory 1 and the trajectory 3 is the most dissimilar. The logaritmization of the values was necessary since the range of values are very different depending on the test executed. 
+With the plots @fig-plot-result and @fig-plot-result-log, it is possible to see that the trajectory 6 is the most similar to the trajectory 1 and the trajectory 3 is the most dissimilar. The logaritmization of the values was necessary since the range of values are very different depending on the test executed. The figure @fig-facet-wrap resolves this problem. 
 
